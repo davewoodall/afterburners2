@@ -1,7 +1,18 @@
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rails db:seed command (or created alongside the database with db:setup).
-#
-# Examples:
-#
-#   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
-#   Character.create(name: 'Luke', movie: movies.first)
+# frozen_string_literal: true
+
+[Artist, Genre, Album].each(&:destroy_all)
+
+path = File.join(Rails.root, 'lib', 'assets', 'albums.csv')
+csv = File.read(path)
+
+CSV.parse(csv, headers: true).each do |row|
+  params = {
+    'name' => row['album'],
+    'year' => row['year'],
+    'artist_attributes' => { 'name' => row['artist'] },
+    'genre_attributes' => { 'name' => row['genre'] }
+  }
+  AlbumFormService.new(params).call
+end
+
+puts 'SEEDED!'
